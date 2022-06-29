@@ -145,7 +145,7 @@ public class NameTest {
     }
 ```
 
-###4.Assertion API
+###4.Junit5 Assertion
 테스트 API를 알아봅시다. 먼저 아래와 같이 테스트할 객체를 준비합니다.
 ```
 public class Study {
@@ -160,14 +160,14 @@ public enum  StudyStatus {
     DRAFT, START, END
 }
 ```
-####4.1 API
-- assertEqulas(expected, actual)
-- assertNotNull(actual)
-- assertTrue(boolean)
-- assertAll(executables...)
-- assertThrows(expectedType, executable)
-- assertTimeout(duration, executable)
-- assertEqulas(expected, actual)
+####4.1.API
+1. assertEqulas(expected, actual)
+2. assertNotNull(actual)
+3. assertTrue(boolean)
+4. assertAll(executables...)
+5. assertThrows(expectedType, executable)
+6. assertTimeout(duration, executable)
+7. assertEqulas(expected, actual)
 - 테스트를 해봅시다. 실패 시 메시지를 넣을 수 있습니다.
 - Test를 한 곳에 2개 넣었다면 앞에 테스트가 실패하면 뒤쪽은 확인이 안됩니다.
  ```
@@ -177,6 +177,7 @@ public enum  StudyStatus {
         Study study = new Study();
         assertNotNull(study);
         assertEquals(StudyStatus.DRAFT, study.getStudyStatus());
+        //Supplier<String> 가 들어갑니다.
         //assertEquals(StudyStatus.DRAFT, study.getStudyStatus(), "실패시 메시지도 넣을 수 있습니다");
         /*assertEquals(StudyStatus.DRAFT, study.getStudyStatus(), new Supplier<String>() {
             @Override
@@ -191,7 +192,150 @@ public enum  StudyStatus {
     Expected :DRAFT
     Actual   :null
 ```
-####4.2.
+- assertAll 을 활용하여 assert 문을 람다 표현식으로 전달하여 한번에 여러 assert문을 실행하여 봅시다.
+```
+    @Test
+    @DisplayName("한번에 assert문 확인")
+    void studyTest2(){
+        Study study = new Study();
+        assertAll(
+                ()->assertNotNull(study),
+                ()->assertEquals(StudyStatus.DRAFT, study.getStudyStatus()),
+                ()->assertTrue(1>2)
+        );
+    }
+
+    expected: <DRAFT> but was: <null>
+    Comparison Failure: 
+    Expected :DRAFT
+    Actual   :null
+    
+    expected: <true> but was: <false>
+    Comparison Failure: 
+    Expected :true
+    Actual   :false
+
+```
+- 예외 테스트 코드를 확인해 봅시다.
+```
+public class Study {
+
+    private StudyStatus studyStatus;
+    private int limit;
+
+    public Study(){
+    }
+
+    public Study(int limit) {
+        if(limit < 0){
+            throw new IllegalArgumentException("limit 은 0보다 작을 수 없습니다.");
+        }
+        this.limit = limit;
+    }
+
+    public int getLimit() {
+        return limit;
+    }
+
+    public StudyStatus getStudyStatus() {
+        return studyStatus;
+    }
+}
+```
+```
+    @Test
+    @DisplayName("예외 테스트 코드 확인")
+    void studyTest3(){
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,()-> new Study(-1));
+        assertEquals("limit 은 0보다 작을 수 없습니다.", exception.getMessage());
+    }
+```
+- 타임아웃 테스트 코드를 작성해 봅시다.
+- 해당 테스트 소스코드가 모두 종료될때까지 기다립니다.
+```
+    @Test
+    @DisplayName("타임아웃 테스트 코드 확인")
+    void studyTest4(){
+
+        assertTimeout(Duration.ofMillis(1000L),()->{
+            new Study();
+            Thread.sleep(15000L);
+        });
+
+    }
+
+```
+- 즉각 종료 테스트 코드 
+- Thread Local 을 사용합니다.
+- Spring의 Transaction 은 ThreadLocal 을 기본 전략으로 사용합니다.
+- 테스트 코드에 Transaction 이 포함된다면 적절히 선택하여 사용하도록 합시다.
+```
+    @Test
+    @DisplayName("타임아웃 테스트 코드 확인")
+    void studyTest4(){
+        assertTimeoutPreemptively(Duration.ofMillis(1000L),()->{
+            new Study();
+            Thread.sleep(15000L);
+        });
+    }
+```
+###5.조건에 따라 테스트
+####5.1.assume
+- assume이 만족하지 않으면 아래 테스트를 실행하지 않고 실행하지 않은것으로 표시합니다.
+1. assumeTrue(조건)
+2. assumeThat(조건, 테스트)
+```
+    @Test
+    @DisplayName("assume")
+    void test(){
+        String test_env = System.getenv("JAVA_HOME");
+        System.out.println(test_env);
+        Assumptions.assumeTrue("C:\\Program Files\\openjdk\\jdk-11".equalsIgnoreCase(test_env));
+        //Assumptions.assumeTrue("".equalsIgnoreCase(test_env));
+
+        Study study = new Study(1);
+        Assertions.assertThat(study.getLimit()).isGreaterThan(0);
+    }
+```
+####5.2.애노테이션활용
+- @Enabled, @Disabled
+- OnOS, OnJre, IfSystemProperty, IfenvironmentVariable, If
+```
+    @Test
+    @DisplayName("test2")
+    @DisabledOnOs(OS.WINDOWS)
+    void test2(){
+        String test_env = System.getenv("JAVA_HOME");
+        System.out.println(test_env);
+        Assumptions.assumeTrue("C:\\Program Files\\openjdk\\jdk-11".equalsIgnoreCase(test_env));
+
+        Study study = new Study(1);
+        Assertions.assertThat(study.getLimit()).isGreaterThan(0);
+    }
+
+    @Test
+    @DisplayName("test3")
+    @DisabledOnJre(JRE.JAVA_11)
+    void test3(){
+        String test_env = System.getenv("JAVA_HOME");
+        System.out.println(test_env);
+        Assumptions.assumeTrue("C:\\Program Files\\openjdk\\jdk-11".equalsIgnoreCase(test_env));
+
+        Study study = new Study(1);
+        Assertions.assertThat(study.getLimit()).isGreaterThan(0);
+    }
+
+    @Test
+    @DisplayName("test4")
+    @EnabledIfEnvironmentVariable(named = "JAVA_HOME", matches = "C:\\Program Files\\openjdk\\jdk-11")
+    void test4(){
+        Study study = new Study(1);
+        Assertions.assertThat(study.getLimit()).isGreaterThan(0);
+    }
+```
+###6.1.태깅과 필터링
+
+
 
 
 
