@@ -333,8 +333,120 @@ public class Study {
         Assertions.assertThat(study.getLimit()).isGreaterThan(0);
     }
 ```
-###6.1.태깅과 필터링
+###6.태깅과 필터링
+- 태깅을 통하여 해당 설정이 된 환경에서의 테스트 진행 
+- 기본적으로 인텔리J에서는 class 기준으로 모두 실행합니다. 설정을 변경하여 줍시다.
+![intellijEditConfigurations](./ZImages/intellijEditConfigurations.PNG)
+- 태그가 local 만 실행됩니다.
+```
+    @Test
+    @DisplayName("true확인1")
+    @Tag("local")
+    void test1(){
+        Assertions.assertTrue(true);
+    }
 
+    @Test
+    @DisplayName("true확인2")
+    @Tag("server")
+    void test2(){
+        Assertions.assertTrue(true);
+    }
+```
+- maven 테스트를 실행해 보면 모든 테스트가 실행되는것을 볼 수 있습니다.
+- 설정을 통하여 특정 tag만 실행하여 봅시다
+- maven 특정 프로파일마다 각기 다른 설정이 가능합니다.
+- pom.xml default 프로파일로 실행해 봅시다.
+- test 실행 시 local 태그만 실행되는것을 확인할 수 있습니다.
+- groups 를 안주면 모든 테스트를 진행합니다. 
+```
+    <profiles>
+		<profile>
+			<id>default</id>
+			<activation>
+				<activeByDefault>true</activeByDefault>
+			</activation>
+			<build>
+				<plugins>
+					<plugin>
+						<artifactId>maven-surefire-plugin</artifactId>
+						<configuration>
+							<groups>local</groups>
+						</configuration>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+		<profile>
+			<id>server</id>
+			<build>
+				<plugins>
+					<plugin>
+						<artifactId>maven-surefire-plugin</artifactId>
+						<configuration>
+							<groups>server</groups>
+							<!--<groups>server|ci</groups>-->
+						</configuration>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+	</profiles>
+```
+```
+$ mvnw test -P server
+```
+###7.커스텀태그
+- 애노테이션을 조합하여 커스텀 태그를 만들어 봅시다.
+- 애노테이션을 추가합니다.
+```
+@Target(ElementType.METHOD)
+@Test
+@Tag("local")
+@Retention(RetentionPolicy.RUNTIME)
+public @interface LocalTest {
+}
+```
+- 커스텀태그를 사용해서 태깅합니다.
+- 태그를 사용하면 typesafe 하지않습니다. (오타 등의 위험)
+```
+    @Test
+    @DisplayName("커스텀태그")
+    @LocalTest
+    void test3(){
+        Assertions.assertTrue(true);
+    }
+```
+###8.테스트 반복하기
+####8.1.RepeatedTest
+- 반복 횟수와 반복 테스트 이름을 설정할 수 있습니다.
+- displayName, currentRepetition, totalRepetitions
+- RepetitionInfo 인자를 받을 수 있습니다.
+```
+    @DisplayName("반복테스트")
+    @RepeatedTest(value = 10, name = "{displayName} {currentRepetition} 회차")
+    void test(RepetitionInfo info){
+        System.out.println("test : " + info.getCurrentRepetition() + "/" + info.getTotalRepetitions());
+    }
+```
+####8.2.Parameterized
+- @ValueSource
+- @NullSource, @EmptySource, @NullAndEmptySource
+- @EnumSource
+- @MethodSource
+- @CsvSource
+- @CvsFileSource
+- @ArgumentSource
+
+- 테스트에 여러 다른 매개변수를 대입해가며 반복 실행합니다.
+```
+    @DisplayName("반복테스트 param")
+    @ParameterizedTest(name = "{displayName}{index},  args : {arguments}")
+    @ValueSource(strings = {"jaeseong","재성"})
+    void test2(String s){
+        System.out.println(s);
+    }
+```
 
 
 
