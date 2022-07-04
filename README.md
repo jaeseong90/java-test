@@ -26,9 +26,11 @@
 미세팁) intellij sout -> system.out.println , 
 psvm public static void main 자동완성 
  
+<hr/>
 
-###2.JUnit 5: 시작하기
-####2.1. 스프링 부트 프로젝트 생성
+###JUnit 5: 시작하기
+
+###1.스프링 부트 프로젝트 생성
  - start.spring.io 에서 프로젝트 생성하여 오픈합니다. (starter 와 test 만 포함하였습니다.)
  - 2.2 이상부터는 spring-boot-test 포함 => 들어가 보면 그 안에 junit 디펜던시 들어있습니다.
  - spring boot 아니면 아래와 같이 추가하여 줍시다. 
@@ -45,7 +47,7 @@ psvm public static void main 자동완성
 - statudy 라는 클래스를 만들고 테스트를 한번 실행하여 봅시다.(안된다면 import static 확인하여 봅시다.) 
 - jupiter API 사용하는것을 볼 수 있습니다. 
   
-```
+```java
 import org.junit.jupiter.api.*;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
@@ -57,14 +59,16 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
     }
 ```
 
-####2.2.기본애노테이션
+<hr/>
+
+####2.기본애노테이션
 - @Test
 - @BeforeAll / @AfterAll
 - @BeforeEach / @AfterEach
 - @Disabled 
 - junut4와 junit5 클래스와 이름이 변경되어 맵핑되어 동일하게 제공
 
-```
+```java
     @Test
     void create(){
         Study study = new Study();
@@ -113,11 +117,14 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
     afterAll
 
 ```
+
+<hr/>
+
 ###3.테스트 이름 표기하기
 ####3.1.DisplayNameGeneration
 - Method와 Class 레퍼런스를 사용해서 테스트 이름을 표기하는 방법 설정입니다.
 - 기본 구현체로 ReplaceUnderscores 가 선택됩니다.(_를 공백으로 치환)
-```
+```java
 
 @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
 public class NameTest {
@@ -135,7 +142,7 @@ public class NameTest {
 ####3.2.DisplayName
 - value를 넣어서 직관적으로 적용 가능합니다.
 - @DisplayNameGeneration 보다 우선 순위입니다.
-```
+```java
     @Test
     @DisplayName("스터디 생성 확인 😁")
     void create_new_study(){
@@ -145,9 +152,14 @@ public class NameTest {
     }
 ```
 
+참고
+- https://junit.org/junit5/docs/current/user-guide/#writing-tests-display-names
+
+<hr/>
+
 ###4.Junit5 Assertion
 테스트 API를 알아봅시다. 먼저 아래와 같이 테스트할 객체를 준비합니다.
-```
+```java
 public class Study {
 
     private StudyStatus studyStatus;
@@ -170,7 +182,7 @@ public enum  StudyStatus {
 7. assertEqulas(expected, actual)
 - 테스트를 해봅시다. 실패 시 메시지를 넣을 수 있습니다.
 - Test를 한 곳에 2개 넣었다면 앞에 테스트가 실패하면 뒤쪽은 확인이 안됩니다.
- ```
+ ```java
     @Test
     @DisplayName("스터디 생성 시 상태가 드래프트인지 확인")
     void create_new_study(){
@@ -193,7 +205,7 @@ public enum  StudyStatus {
     Actual   :null
 ```
 - assertAll 을 활용하여 assert 문을 람다 표현식으로 전달하여 한번에 여러 assert문을 실행하여 봅시다.
-```
+```java
     @Test
     @DisplayName("한번에 assert문 확인")
     void studyTest2(){
@@ -217,7 +229,7 @@ public enum  StudyStatus {
 
 ```
 - 예외 테스트 코드를 확인해 봅시다.
-```
+```java
 public class Study {
 
     private StudyStatus studyStatus;
@@ -242,7 +254,7 @@ public class Study {
     }
 }
 ```
-```
+```java
     @Test
     @DisplayName("예외 테스트 코드 확인")
     void studyTest3(){
@@ -252,7 +264,7 @@ public class Study {
 ```
 - 타임아웃 테스트 코드를 작성해 봅시다.
 - 해당 테스트 소스코드가 모두 종료될때까지 기다립니다.
-```
+```java
     @Test
     @DisplayName("타임아웃 테스트 코드 확인")
     void studyTest4(){
@@ -269,7 +281,7 @@ public class Study {
 - Thread Local 을 사용합니다.
 - Spring의 Transaction 은 ThreadLocal 을 기본 전략으로 사용합니다.
 - 테스트 코드에 Transaction 이 포함된다면 적절히 선택하여 사용하도록 합시다.
-```
+```java
     @Test
     @DisplayName("타임아웃 테스트 코드 확인")
     void studyTest4(){
@@ -279,12 +291,15 @@ public class Study {
         });
     }
 ```
+
+<hr/>
+
 ###5.조건에 따라 테스트
 ####5.1.assume
 - assume이 만족하지 않으면 아래 테스트를 실행하지 않고 실행하지 않은것으로 표시합니다.
 1. assumeTrue(조건)
 2. assumeThat(조건, 테스트)
-```
+```java
     @Test
     @DisplayName("assume")
     void test(){
@@ -300,7 +315,7 @@ public class Study {
 ####5.2.애노테이션활용
 - @Enabled, @Disabled
 - OnOS, OnJre, IfSystemProperty, IfenvironmentVariable, If
-```
+```java
     @Test
     @DisplayName("test2")
     @DisabledOnOs(OS.WINDOWS)
@@ -333,12 +348,15 @@ public class Study {
         Assertions.assertThat(study.getLimit()).isGreaterThan(0);
     }
 ```
+
+<hr/>
+
 ###6.태깅과 필터링
 - 태깅을 통하여 해당 설정이 된 환경에서의 테스트 진행 
 - 기본적으로 인텔리J에서는 class 기준으로 모두 실행합니다. 설정을 변경하여 줍시다.
 ![intellijEditConfigurations](./ZImages/intellijEditConfigurations.PNG)
 - 태그가 local 만 실행됩니다.
-```
+```java
     @Test
     @DisplayName("true확인1")
     @Tag("local")
@@ -359,7 +377,7 @@ public class Study {
 - pom.xml default 프로파일로 실행해 봅시다.
 - test 실행 시 local 태그만 실행되는것을 확인할 수 있습니다.
 - groups 를 안주면 모든 테스트를 진행합니다. 
-```
+```xml
     <profiles>
 		<profile>
 			<id>default</id>
@@ -396,10 +414,13 @@ public class Study {
 ```
 $ mvnw test -P server
 ```
+
+<hr/>
+
 ###7.커스텀태그
 - 애노테이션을 조합하여 커스텀 태그를 만들어 봅시다.
 - 애노테이션을 추가합니다.
-```
+```java
 @Target(ElementType.METHOD)
 @Test
 @Tag("local")
@@ -409,7 +430,7 @@ public @interface LocalTest {
 ```
 - 커스텀태그를 사용해서 태깅합니다.
 - 태그를 사용하면 typesafe 하지않습니다. (오타 등의 위험)
-```
+```java
     @Test
     @DisplayName("커스텀태그")
     @LocalTest
@@ -417,12 +438,17 @@ public @interface LocalTest {
         Assertions.assertTrue(true);
     }
 ```
+
+참고
+- https://maven.apache.org/guides/introduction/introduction-to-profiles.html
+- https://junit.org/junit5/docs/current/user-guide/#running-tests-tag-expressions
+
 ###8.테스트 반복하기
 ####8.1.RepeatedTest
 - 반복 횟수와 반복 테스트 이름을 설정할 수 있습니다.
 - displayName, currentRepetition, totalRepetitions
 - RepetitionInfo 인자를 받을 수 있습니다.
-```
+```java
     @DisplayName("반복테스트")
     @RepeatedTest(value = 10, name = "{displayName} {currentRepetition} 회차")
     void test(RepetitionInfo info){
@@ -430,6 +456,7 @@ public @interface LocalTest {
     }
 ```
 ####8.2.Parameterized
+테스트에 여러 다른 매개변수를 대입해가며 반복 실행합니다.
 - @ValueSource
 - @NullSource, @EmptySource, @NullAndEmptySource
 - @EnumSource
@@ -438,13 +465,128 @@ public @interface LocalTest {
 - @CvsFileSource
 - @ArgumentSource
 
-- 테스트에 여러 다른 매개변수를 대입해가며 반복 실행합니다.
-```
+1. 형변환
+    - 암시적 타입변환 가능
+    - 명시적 타입변환 
+        - SimpleArgumentConverter 상속 받은 구현체
+        - @ConvertWith   
+2. 인자 값 조합
+    - ArgumentsAccessor
+    - 커스텀 Accessor
+        - ArgumentsAggregator 인터페이스 구현
+        - @AggregateWith
+
+```java
     @DisplayName("반복테스트 param")
     @ParameterizedTest(name = "{displayName}{index},  args : {arguments}")
     @ValueSource(strings = {"jaeseong","재성"})
     void test2(String s){
         System.out.println(s);
+    }
+```
+```java
+    @DisplayName("반복테스트 null, empty")
+    @ParameterizedTest(name = "{displayName}{index},  args : {arguments}")
+    @NullSource
+    @EmptySource
+    @NullAndEmptySource
+    void test3(Study s){
+        System.out.println(s);
+    }
+```
+```java
+    @DisplayName("ParameterizedTest 타입변환 Converter 이용")
+    @ParameterizedTest
+    @ValueSource(ints = {10,20})
+    void test4(@ConvertWith(StudyConverter.class) Study study){
+        System.out.println(study.getLimit());
+    }
+
+    static class StudyConverter extends SimpleArgumentConverter{
+        @Override
+        protected Object convert(Object o, Class<?> aClass) throws ArgumentConversionException {
+            Assertions.assertEquals(Study.class, aClass,"study만 가능");
+            return new Study(Integer.parseInt(o.toString()));
+        }
+    }
+```
+```java
+public class Study {
+
+    private StudyStatus studyStatus;
+    private String title;
+    private int limit;
+
+    public Study(){
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public Study(String title, int limit) {
+        this.title = title;
+        this.limit = limit;
+    }
+
+    @Override
+    public String toString() {
+        return "Study{" +
+                "studyStatus=" + studyStatus +
+                ", title='" + title + '\'' +
+                ", limit=" + limit +
+                '}';
+    }
+
+    public Study(int limit) {
+        if(limit < 0){
+            throw new IllegalArgumentException("limit 은 0보다 작을 수 없습니다.");
+        }
+        this.limit = limit;
+    }
+
+    public int getLimit() {
+        return limit;
+    }
+
+    public StudyStatus getStudyStatus() {
+        return studyStatus;
+    }
+}
+
+
+
+    @DisplayName("ParameterizedTest csv")
+    @ParameterizedTest
+    @CsvSource({"'java-test', 10", "'spring', 20"})
+    void test5(String name, Integer limit){
+        Study study = new Study(name, limit);
+        System.out.println(study);
+    }
+
+```
+```java
+    @DisplayName("ParameterizedTest csv with argumentsAccessor")
+    @ParameterizedTest
+    @CsvSource({"'java-test', 10", "'spring', 20"})
+    void test6(ArgumentsAccessor argumentsAccessor){
+        Study study = new Study(argumentsAccessor.getString(0), argumentsAccessor.getInteger(1));
+        System.out.println(study);
+    }
+```
+```java
+    @DisplayName("ParameterizedTest csv with ArgumentsAggregator")
+    @ParameterizedTest
+    @CsvSource({"'java-test', 10", "'spring', 20"})
+    void test7(@AggregateWith(StudyArgumentsAggregator.class) Study study){
+        System.out.println(study);
+    }
+
+    static class StudyArgumentsAggregator implements ArgumentsAggregator{
+        @Override
+        public Object aggregateArguments(ArgumentsAccessor argumentsAccessor, ParameterContext parameterContext) throws ArgumentsAggregationException {
+            return new Study(argumentsAccessor.getString(0), argumentsAccessor.getInteger(1));
+        }
     }
 ```
 
