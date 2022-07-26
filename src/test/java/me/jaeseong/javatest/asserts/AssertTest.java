@@ -1,5 +1,7 @@
-package me.jaeseong.javatest;
+package me.jaeseong.javatest.asserts;
 
+import me.jaeseong.javatest.Study;
+import me.jaeseong.javatest.StudyStatus;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -16,7 +18,7 @@ public class AssertTest {
     void studyTest(){
         Study study = new Study();
         assertNotNull(study);
-        assertEquals(StudyStatus.DRAFT, study.getStudyStatus(), "실패시 메시지도 넣을 수 있습니다");
+        Assertions.assertEquals(StudyStatus.DRAFT, study.getStudyStatus(), "실패시 메시지도 넣을 수 있습니다");
         /*assertEquals(StudyStatus.DRAFT, study.getStudyStatus(), new Supplier<String>() {
             @Override
             public String get() {

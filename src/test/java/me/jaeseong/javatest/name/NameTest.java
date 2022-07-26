@@ -1,5 +1,6 @@
-package me.jaeseong.javatest;
+package me.jaeseong.javatest.name;
 
+import me.jaeseong.javatest.Study;
 import org.junit.jupiter.api.*;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;

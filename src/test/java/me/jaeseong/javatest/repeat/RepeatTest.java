@@ -1,5 +1,6 @@
-package me.jaeseong.javatest;
+package me.jaeseong.javatest.repeat;
 
+import me.jaeseong.javatest.Study;
 import org.apache.logging.log4j.util.Strings;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ParameterContext;

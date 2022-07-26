@@ -1,5 +1,6 @@
-package me.jaeseong.javatest;
+package me.jaeseong.javatest.assum;
 
+import me.jaeseong.javatest.Study;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.DisplayName;

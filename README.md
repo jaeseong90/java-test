@@ -672,9 +672,27 @@ org.junit.jupiter.api.DisplayNameGenerator$ReplaceUnderscores
 
 <hr/>
 
-###13.JUnit5확장모델
+###13.JUnit5확장모델 Extension
+- Extension 으로 확장
 
+####13.1. 등록방법
+- 선언적인 등록 @ExtendWith
+- 프로그래밍 등록 @RegisterExtension
+- 자동 등록 자바 ServiceLoader 이용( junit properties 를 통해 사용가능)
 
+- 참고 https://junit.org/junit5/docs/current/user-guide/#extensions
+
+<hr/>
+
+###14.Junit4마이그레이션
+- 실습은 넘어가도록 합시다.
+
+![캡처2](./Zimages/캡처2.PNG)
+
+<hr/>
+
+###15.연습 
+- 
 
 
 <hr/>

@@ -1,4 +1,4 @@
-package me.jaeseong.javatest;
+package me.jaeseong.javatest.configs;
 
 import org.junit.jupiter.api.Test;
 
