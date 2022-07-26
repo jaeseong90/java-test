@@ -476,6 +476,7 @@ public @interface LocalTest {
         - ArgumentsAggregator 인터페이스 구현
         - @AggregateWith
 
+
 ```java
     @DisplayName("반복테스트 param")
     @ParameterizedTest(name = "{displayName}{index},  args : {arguments}")
@@ -589,8 +590,93 @@ public class Study {
         }
     }
 ```
+- 참고 
+ https://junit.org/junit5/docs/current/user-guide/#writing-tests-parameterized-tests
+
+<hr/>
+
+###9.테스트 인스턴스
+- 단위테스트의 메서드는 각각 테스트마다 독립된 인스턴스를 생성하여 실행되는것을 기본전략으로 합니다.
+- 단위테스트는 독립적으로 실행하여 예상치 못한 오류를 방지하기 위함입니다.
+- @TestInstance 애노테이션을 통하여 인스턴스를 공유 할 수 있습니다.
+- 이 때 before, after 테스트는 static 이 아니여도 됩니다.
+
+```java
+
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
+
+//@TestInstance(TestInstance.Lifecycle.PER_CLASS)
+public class InstanceTest {
+    int value = 1;
+    @Test
+    void test(){
+        System.out.println(value++);
+    }
+
+    @Test
+    void test2(){
+        System.out.println(value++);
+    }
+}
+
+```
+
+<hr/>
+
+###10.테스트순서
+- 테스트 메서드는 특정한 순서에 의해 실행되지만 어떻게 그 순서를 정하는지는 분명하지 않습니다. 순서대로 실행된다고 생각하고 작성하면 안됩니다.
+- 경우에 따라 특정 순서대로 실행하고 싶을때도 있습니다. 그 경우에는 테스트 메소드를 원하는 순서에 따라 실행하도록 TestInstance 애노테이션과
+함께 @TestMethodOrder 구현체를 설정합니다.
+```java
+package me.jaeseong.javatest;
+
+import org.junit.jupiter.api.*;
+
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
+public class InstanceTest {
+    int value = 1;
+
+    @Test
+    @Order(2)
+    void test(){
+        System.out.println(value++);
+    }
+
+    @Test
+    @Order(1)
+    void test2(){
+        System.out.println(value++);
+    }
+}
+```
+
+<hr/>
+
+###11.junit-platform.properties
+- JUnit 설정 파일로, 클래스패스 루트 (src/test/resources/)에 넣어두면 적용됩니다.
+- IntelliJ [project structure] - [module] - TestResources 로 설정되어 있어야 인식합니다.
+
+```xml
+#테스트 인스턴스 라이프사이클 설정
+junit.jupiter.testinstance.lifecycle.default = per_class
+#확장팩 자동 감지 기능 default false
+junit.jupiter.extensions.autodetection.enabled = true
+#@Disabled 무시하고 실행하기
+junit.jupiter.conditions.deactivate = org.junit.*DisabledCondition
+#테스트 이름 표기 전략 설정
+junit.jupiter.displayname.generator.default = \
+org.junit.jupiter.api.DisplayNameGenerator$ReplaceUnderscores
+```
+
+<hr/>
+
+###13.JUnit5확장모델
 
 
 
+
+<hr/>
 
 #### from inflearn whiteship
